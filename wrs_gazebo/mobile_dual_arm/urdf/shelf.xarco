@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<robot name="shelf" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- <link name="world"/> -->
+
+  <link
+    name="shelf_higher" >
+    <inertial>
+      <origin
+       	xyz="-0.65 0.4625 0"
+       	rpy="0 0 3.1416" />
+     <mass
+       value="13.363391022414" />
+     <inertia
+       ixx="1"
+       ixy="0"
+       ixz="0"
+       iyy="1"
+       iyz="0"
+       izz="1" />
+    </inertial>
+    <visual>
+      <origin
+       	xyz="-0.65 0.4625 0"
+       	rpy="0 0 3.1416" />
+      <geometry>
+          <mesh scale="0.001 0.001 0.001"
+            filename="package://mobile_dual_arm/scene/meshes/shelf_higher.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" /> 
+          <!-- <ambient>0.1 0.1 0.1 0.5</ambient> -->
+      </material>
+    </visual>
+    <collision>
+      <origin
+       	xyz="-0.65 0.4625 0"
+       	rpy="0 0 3.1416" />
+      <geometry>
+        <mesh scale="0.001 0.001 0.001"
+          filename="package://mobile_dual_arm/scene/meshes/shelf_higher.STL"/>
+      </geometry>
+      <!-- </collision>
+      <surface>
+        <friction>
+          <ode>
+            <mu>0.5</mu>
+            <mu2>0.5</mu2>
+          </ode>
+        </friction>
+        <contact>
+          <elastic_modulus>0.01</elastic_modulus>
+        </contact>
+      </surface> -->
+    </collision>
+  </link>
+  <!-- <joint name="fixed1" type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent link="world"/>
+    <child link="shelf_higher"/>
+  </joint> -->
+</robot>

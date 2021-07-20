@@ -1,0 +1,5 @@
+float64[] send_goal
+
+---
+
+float64[] moveit_position

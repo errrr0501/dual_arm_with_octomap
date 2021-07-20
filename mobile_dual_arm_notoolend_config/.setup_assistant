@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: mobile_dual_arm
+    relative_path: urdf/mobile_dual_arm_notoolend.xacro
+    xacro_args: --inorder
+  SRDF:
+    relative_path: config/mobile_dual_arm.srdf
+  CONFIG:
+    author_name: l
+    author_email: errrr0501done@gmail.com
+    generated_timestamp: 1602697132

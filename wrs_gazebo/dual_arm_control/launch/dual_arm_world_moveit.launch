@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<launch>
+ 
+  <!-- these are the arguments you can pass this launch file, for example paused:=true -->
+  <arg name="world_name" value="$(find mobile_dual_arm)/worlds/mobile_dual_arm.world"/>
+  <arg name="paused" default="true"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(arg world_name)"/>
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="headless" value="$(arg headless)"/>
+  </include>
+
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find mobile_dual_arm)/urdf/mobile_dual_arm.xacro"/>
+
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="True" output="screen" args="-urdf -model mobile_dual_arm -param robot_description"/>
+
+    <!-- Load joint controller configurations from YAML file to parameter server -->
+    <rosparam file="$(find dual_arm_control)/config/dual_arm_control.yaml" command="load"/>
+
+    <!-- load the controllers -->
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" ns="/dual_arm"
+    output="screen" args="right_arm_controller
+                          left_arm_controller"/>
+
+    <!-- convert joint states to TF transforms for rviz, etc -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
+      <remap from="/joint_states" to="/dual_arm/joint_states" />
+    </node>
+
+</launch>

@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<launch>
+  <param name="/use_sim_time" value="true" />
+
+
+  <!-- these are the arguments you can pass this launch file, for example paused:=true -->
+  <arg name="world_name" value="$(find mobile_dual_arm)/worlds/mobile_dual_arm.world"/>
+  <arg name="paused" default="true"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+    <!--<arg name="en_sim" default="false"/>
+    <include file="$(find manipulator_h_manager)/launch/single_arm.launch">
+        <arg name="side"   value="right"/>
+        <arg name="en_sim" value="$(arg en_sim)"/>
+    </include>
+    <include file="$(find manipulator_h_manager)/launch/single_arm.launch">
+        <arg name="side"   value="left"/>
+        <arg name="en_sim" value="$(arg en_sim)"/>
+    </include>
+    <include file="$(find mobile_dual_arm)/launch/mobile_dual_arm.launch" if="$(arg en_sim)">
+        <arg name="paused" default="true"/>
+	<arg name="use_sim_time" default="true"/>
+	<arg name="gui" default="true"/>
+	<arg name="headless" default="false"/>
+	<arg name="debug" default="false"/>
+    </include>-->
+
+  
+  <!-- ros_control rrbot launch file -->
+
+  <!-- <include file="$(find dual_arm_control)/launch/dual_arm_control.launch" /> -->
+
+
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(arg world_name)"/>
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="headless" value="$(arg headless)"/>
+
+
+  </include> 
+  <include file="$(find mobile_dual_arm_moveit_config)/launch/move_group.launch">
+    <arg name="publish_monitored_planning_scene" value="true" />
+  </include>
+
+      <!-- We do not have a robot connected, so publish fake joint states -->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <param name="/use_gui" value="false"/> 
+    <rosparam param="/source_list">[/mobile_dual_arm/joint_states]</rosparam>
+  </node>
+
+
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find mobile_dual_arm)/urdf/mobile_dual_arm.xacro"/>
+
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-urdf -model mobile_dual_arm -param robot_description"/> 
+
+    <!-- Load joint controller configurations from YAML file to parameter server -->
+    <rosparam file="$(find mobile_dual_arm_moveit_config)/config/mobile_dual_arm_control_moveit.yaml" command="load"/>
+
+    <!-- load the controllers -->
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" ns="/mobile_dual_arm"
+    output="screen" args="joint_state_controller
+                          right_arm_controller
+                          left_arm_controller"/>
+
+    <!-- convert joint states to TF transforms for rviz, etc -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
+      <remap from="/joint_states" to="/mobile_dual_arm/joint_states" />
+    </node>
+
+
+</launch>
